@@ -11,16 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Sign Up</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">    background-image: url(C:\Users\LOQ\Downloads\drumspic.jpg);</string>
+   <string notr="true">QDialog { background-color: #f0f0f0; } QLabel { color: #333; font-weight: bold; } QLineEdit { background-color: white; border: 1px solid #ccc; border-radius: 5px; padding: 5px; } QPushButton { background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 8px; }</string>
   </property>
   <widget class="QWidget" name="horizontalLayoutWidget_3">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>180</y>
+     <y>160</y>
      <width>361</width>
      <height>41</height>
     </rect>
@@ -45,9 +45,9 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>230</y>
-     <width>151</width>
-     <height>61</height>
+     <y>220</y>
+     <width>121</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="orientation">
@@ -77,7 +77,7 @@
     <item>
      <widget class="QLineEdit" name="lineEdit_10">
       <property name="echoMode">
-       <enum>QLineEdit::Password</enum>
+       <enum>QLineEdit::EchoMode::Password</enum>
       </property>
      </widget>
     </item>
@@ -87,7 +87,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>50</y>
+     <y>80</y>
      <width>261</width>
      <height>41</height>
     </rect>

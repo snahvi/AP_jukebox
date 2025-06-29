@@ -9,6 +9,16 @@ signin::signin(QWidget *parent)
 {
     ui->setupUi(this);
     
+    // Apply clean styling programmatically
+    this->setStyleSheet(
+        "QDialog { background-color: #f0f0f0; }"
+        "QLabel { color: #333; font-weight: bold; }"
+        "QLineEdit { background-color: white; color: black; border: 1px solid #ccc; border-radius: 5px; padding: 5px; font-size: 12px; }"
+        "QPushButton { background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 8px; }"
+        "QPushButton#forgotpassword_btn { background-color: #007acc; color: white; border: none; border-radius: 5px; padding: 8px; }"
+    );
+    this->setWindowTitle("Sign In");
+    
     // Connect the button programmatically
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &signin::on_buttonBox_accepted);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -59,6 +69,7 @@ void signin::onLoginSuccess(User* user)
 {
     QMessageBox::information(this, "Success", "Login successful! Welcome, " + user->getUsername() + "!");
     accept();
+    this->close();
 }
 
 void signin::onLoginFailed(const QString& reason)

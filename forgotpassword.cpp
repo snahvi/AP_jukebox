@@ -8,6 +8,15 @@ forgotpassword::forgotpassword(QWidget *parent)
 {
     ui->setupUi(this);
     
+    // Apply clean styling programmatically
+    this->setStyleSheet(
+        "QDialog { background-color: #f0f0f0; }"
+        "QLabel { color: #333; font-weight: bold; }"
+        "QLineEdit { background-color: white; color: black; border: 1px solid #ccc; border-radius: 5px; padding: 5px; font-size: 12px; }"
+        "QPushButton { background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 8px; }"
+    );
+    this->setWindowTitle("Forgot Password");
+    
     // Connect the button programmatically
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &forgotpassword::on_buttonBox_accepted);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -61,6 +70,7 @@ void forgotpassword::onPasswordRecoverySuccess()
 {
     QMessageBox::information(this, "Success", "Password has been successfully updated!");
     accept();
+    this->close();
 }
 
 void forgotpassword::onPasswordRecoveryFailed(const QString& reason)

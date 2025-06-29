@@ -8,6 +8,15 @@ signuppage::signuppage(QWidget *parent)
 {
     ui->setupUi(this);
     
+    // Apply clean styling programmatically
+    this->setStyleSheet(
+        "QDialog { background-color: #f0f0f0; }"
+        "QLabel { color: #333; font-weight: bold; }"
+        "QLineEdit { background-color: white; color: black; border: 1px solid #ccc; border-radius: 5px; padding: 5px; font-size: 12px; }"
+        "QPushButton { background-color: #28a745; color: white; border: none; border-radius: 5px; padding: 8px; }"
+    );
+    this->setWindowTitle("Sign Up");
+    
     // Connect the button programmatically
     connect(ui->cancel_btn, &QDialogButtonBox::accepted, this, &signuppage::on_cancel_btn_accepted);
     connect(ui->cancel_btn, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -55,6 +64,7 @@ void signuppage::onRegistrationSuccess(const QString& username)
 {
     QMessageBox::information(this, "Success", "Registration successful! Welcome, " + username + "!");
     accept();
+    this->close();
 }
 
 void signuppage::onRegistrationFailed(const QString& reason)
