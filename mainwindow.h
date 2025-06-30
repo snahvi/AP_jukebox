@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include "ui_mainwindow.h"
+#include "user.h"
+#include "song.h"
 #include <QMainWindow>
 #include <QtMultimedia/QMediaPlayer>
 #include <QtCore>
@@ -47,6 +49,11 @@ private slots:
     void on_horizontalSlider_valueChanged(int value);
 
     void on_verticalSlider_valueChanged(int value);
+    
+    // New playlist management slots
+    void on_actionNew_Playlist_triggered();
+    void on_actionOpen_Folder_triggered();
+    void on_actionLoad_Playlist_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -56,6 +63,17 @@ private:
     QAudioOutput *audioOutput;
     qint64 Mduration;
     qint64 Mprogress;
+
+    // User and playlist functionality
+    User *currentUser;
+    int currentSongIndex;
+
+    // Helper methods
+    void loadSong(int index);
+    void initializeUser();
+    void updatePlaylistDisplay();
+    void playCurrentPlaylist();
+    Song getCurrentSong();
 };
 
 #endif // MAINWINDOW_H

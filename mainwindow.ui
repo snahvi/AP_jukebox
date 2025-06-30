@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>🎵 MuPlayer - Music Player with Playlist</string>
   </property>
   <property name="styleSheet">
    <string notr="true">   background-color: #0D1A4A;</string>
@@ -22,12 +22,32 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>171</width>
-      <height>61</height>
+      <width>780</width>
+      <height>80</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: white;
+background-color: rgba(255, 255, 255, 30);
+border-radius: 10px;
+padding: 10px;
+text-align: center;</string>
+    </property>
     <property name="text">
-     <string>Song Name</string>
+     <string>🎵 Loading Playlist...</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QSlider" name="horizontalSlider">
@@ -304,6 +324,35 @@ QPushButton:hover
      <string/>
     </property>
    </widget>
+   <widget class="QLabel" name="label_playlist_status">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>780</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: #B0BEC5;
+background-color: rgba(255, 255, 255, 10);
+border-radius: 5px;
+padding: 5px;</string>
+    </property>
+    <property name="text">
+     <string>📂 Playlist: 3 Songs Available</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -316,16 +365,40 @@ QPushButton:hover
    </property>
    <widget class="QMenu" name="menuOpen">
     <property name="title">
-     <string>Open </string>
+     <string>File</string>
     </property>
     <addaction name="actionOpen_file"/>
    </widget>
+   <widget class="QMenu" name="menuPlaylist">
+    <property name="title">
+     <string>Playlist</string>
+    </property>
+    <addaction name="actionNew_Playlist"/>
+    <addaction name="actionOpen_Folder"/>
+    <addaction name="actionLoad_Playlist"/>
+   </widget>
    <addaction name="menuOpen"/>
+   <addaction name="menuPlaylist"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_file">
    <property name="text">
-    <string>Open file</string>
+    <string>Open Audio File</string>
+   </property>
+  </action>
+  <action name="actionNew_Playlist">
+   <property name="text">
+    <string>New Playlist</string>
+   </property>
+  </action>
+  <action name="actionOpen_Folder">
+   <property name="text">
+    <string>Create Playlist from Folder</string>
+   </property>
+  </action>
+  <action name="actionLoad_Playlist">
+   <property name="text">
+    <string>Load Playlist</string>
    </property>
   </action>
  </widget>

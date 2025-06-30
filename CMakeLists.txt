@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(muplayer LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia MultimediaWidgets)
 qt_standard_project_setup()
 
 qt_add_executable(muplayer
@@ -10,6 +10,10 @@ qt_add_executable(muplayer
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    song.cpp
+    song.h
+    user.cpp
+    user.h
 )
 
 target_link_libraries(muplayer
@@ -17,6 +21,7 @@ target_link_libraries(muplayer
         Qt::Core
         Qt::Widgets
         Qt::Multimedia
+        Qt::MultimediaWidgets
 )
 
 include(GNUInstallDirs)
