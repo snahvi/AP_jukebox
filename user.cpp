@@ -25,9 +25,19 @@ void Playlist::setName(const QString &name)
 
 void Playlist::addSong(const Song &song)
 {
-    if (song.isValid()) {
+    if (song.isValid() && !containsSong(song)) {
         m_songs.append(song);
     }
+}
+
+bool Playlist::containsSong(const Song &song) const
+{
+    for (const Song &existingSong : m_songs) {
+        if (existingSong.getFilePath() == song.getFilePath()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Playlist::removeSong(int index)
@@ -79,13 +89,90 @@ void Playlist::moveDown(int index)
     }
 }
 
+// Queue implementation
+Queue::Queue()
+{
+}
+
+void Queue::addSong(const Song &song)
+{
+    if (song.isValid()) {
+        m_songs.append(song);
+    }
+}
+
+void Queue::insertSong(int position, const Song &song)
+{
+    if (song.isValid() && position >= 0 && position <= m_songs.size()) {
+        m_songs.insert(position, song);
+    }
+}
+
+void Queue::removeSong(int index)
+{
+    if (index >= 0 && index < m_songs.size()) {
+        m_songs.removeAt(index);
+    }
+}
+
+Song Queue::takeFirstSong()
+{
+    if (!m_songs.isEmpty()) {
+        return m_songs.takeFirst();
+    }
+    return Song(); // Return invalid song if queue is empty
+}
+
+void Queue::clearQueue()
+{
+    m_songs.clear();
+}
+
+QList<Song> Queue::getSongs() const
+{
+    return m_songs;
+}
+
+Song Queue::getSong(int index) const
+{
+    if (index >= 0 && index < m_songs.size()) {
+        return m_songs[index];
+    }
+    return Song(); // Return invalid song
+}
+
+int Queue::getSongCount() const
+{
+    return m_songs.size();
+}
+
+bool Queue::isEmpty() const
+{
+    return m_songs.isEmpty();
+}
+
+void Queue::moveUp(int index)
+{
+    if (index > 0 && index < m_songs.size()) {
+        m_songs.swapItemsAt(index, index - 1);
+    }
+}
+
+void Queue::moveDown(int index)
+{
+    if (index >= 0 && index < m_songs.size() - 1) {
+        m_songs.swapItemsAt(index, index + 1);
+    }
+}
+
 // User implementation
 User::User()
+    : m_queueMode(false)
 {
 }
 
 User::User(const QString &username)
-    : m_username(username)
+    : m_username(username), m_queueMode(false)
 {
 }
 
@@ -219,6 +306,34 @@ void User::createPlaylistFromFolder(const QString &playlistName, const QString &
             playlist->addSong(song);
         }
         qDebug() << "Created playlist" << playlistName << "with" << songs.size() << "songs from folder:" << folderPath;
+    }
+}
+
+Queue* User::getQueue()
+{
+    return &m_queue;
+}
+
+void User::clearQueue()
+{
+    m_queue.clearQueue();
+}
+
+bool User::isQueueMode() const
+{
+    return m_queueMode;
+}
+
+void User::setQueueMode(bool enabled)
+{
+    m_queueMode = enabled;
+    if (enabled) {
+        // When switching to queue mode, we keep the queue as is
+        qDebug() << "Switched to queue mode";
+    } else {
+        // When switching away from queue mode, clear the queue
+        clearQueue();
+        qDebug() << "Switched away from queue mode, queue cleared";
     }
 }
 

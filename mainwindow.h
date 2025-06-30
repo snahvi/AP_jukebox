@@ -54,6 +54,13 @@ private slots:
     void on_actionNew_Playlist_triggered();
     void on_actionOpen_Folder_triggered();
     void on_actionLoad_Playlist_triggered();
+    void on_actionAdd_Songs_triggered();
+    
+    // Queue management slots
+    void on_actionEnable_Queue_triggered();
+    void on_actionAdd_to_Queue_triggered();
+    void on_actionView_Queue_triggered();
+    void on_actionClear_Queue_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -70,10 +77,14 @@ private:
 
     // Helper methods
     void loadSong(int index);
+    void loadNextSongFromQueue();
     void initializeUser();
     void updatePlaylistDisplay();
+    void updateNextSongDisplay();
     void playCurrentPlaylist();
     Song getCurrentSong();
+    Song getNextSong();
+    void onSongFinished();
 };
 
 #endif // MAINWINDOW_H

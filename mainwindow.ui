@@ -29,7 +29,6 @@
     <property name="font">
      <font>
       <pointsize>12</pointsize>
-      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -54,7 +53,7 @@ text-align: center;</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>290</y>
+      <y>300</y>
       <width>681</width>
       <height>31</height>
      </rect>
@@ -283,7 +282,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>730</x>
-      <y>290</y>
+      <y>300</y>
       <width>20</width>
       <height>121</height>
      </rect>
@@ -296,7 +295,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>260</y>
+      <y>280</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -312,7 +311,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>260</y>
+      <y>280</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -336,7 +335,6 @@ QPushButton:hover
     <property name="font">
      <font>
       <pointsize>10</pointsize>
-      <weight>50</weight>
       <bold>false</bold>
      </font>
     </property>
@@ -348,6 +346,34 @@ padding: 5px;</string>
     </property>
     <property name="text">
      <string>📂 Playlist: 3 Songs Available</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_next_song">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>780</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: #90A4AE;
+background-color: rgba(255, 255, 255, 5);
+border-radius: 3px;
+padding: 3px;</string>
+    </property>
+    <property name="text">
+     <string>⏭️ Next: No song queued</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -376,9 +402,23 @@ padding: 5px;</string>
     <addaction name="actionNew_Playlist"/>
     <addaction name="actionOpen_Folder"/>
     <addaction name="actionLoad_Playlist"/>
+    <addaction name="separator"/>
+    <addaction name="actionAdd_Songs"/>
+   </widget>
+   <widget class="QMenu" name="menuQueue">
+    <property name="title">
+     <string>Queue</string>
+    </property>
+    <addaction name="actionEnable_Queue"/>
+    <addaction name="separator"/>
+    <addaction name="actionAdd_to_Queue"/>
+    <addaction name="actionView_Queue"/>
+    <addaction name="separator"/>
+    <addaction name="actionClear_Queue"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuPlaylist"/>
+   <addaction name="menuQueue"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_file">
@@ -399,6 +439,34 @@ padding: 5px;</string>
   <action name="actionLoad_Playlist">
    <property name="text">
     <string>Load Playlist</string>
+   </property>
+  </action>
+  <action name="actionAdd_Songs">
+   <property name="text">
+    <string>Add Songs to Playlist</string>
+   </property>
+  </action>
+  <action name="actionEnable_Queue">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable Queue Mode</string>
+   </property>
+  </action>
+  <action name="actionAdd_to_Queue">
+   <property name="text">
+    <string>Add Songs to Queue</string>
+   </property>
+  </action>
+  <action name="actionView_Queue">
+   <property name="text">
+    <string>View/Edit Queue</string>
+   </property>
+  </action>
+  <action name="actionClear_Queue">
+   <property name="text">
+    <string>Clear Queue</string>
    </property>
   </action>
  </widget>
