@@ -61,6 +61,10 @@ private slots:
     void on_actionAdd_to_Queue_triggered();
     void on_actionView_Queue_triggered();
     void on_actionClear_Queue_triggered();
+    
+    // Button slots
+    void on_button_shuffle_clicked();
+    void on_button_repeat_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -81,6 +85,7 @@ private:
     void initializeUser();
     void updatePlaylistDisplay();
     void updateNextSongDisplay();
+    void updateButtonStates();
     void playCurrentPlaylist();
     Song getCurrentSong();
     Song getNextSong();

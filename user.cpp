@@ -2,6 +2,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDebug>
+#include <random>
+#include <algorithm>
 
 // Playlist implementation
 Playlist::Playlist()
@@ -123,6 +125,8 @@ Song Queue::takeFirstSong()
     return Song(); // Return invalid song if queue is empty
 }
 
+
+
 void Queue::clearQueue()
 {
     m_songs.clear();
@@ -165,14 +169,16 @@ void Queue::moveDown(int index)
     }
 }
 
+
+
 // User implementation
 User::User()
-    : m_queueMode(false)
+    : m_queueMode(false), m_shuffleEnabled(false), m_repeatEnabled(false)
 {
 }
 
 User::User(const QString &username)
-    : m_username(username), m_queueMode(false)
+    : m_username(username), m_queueMode(false), m_shuffleEnabled(false), m_repeatEnabled(false)
 {
 }
 
@@ -335,6 +341,52 @@ void User::setQueueMode(bool enabled)
         clearQueue();
         qDebug() << "Switched away from queue mode, queue cleared";
     }
+}
+
+bool User::isShuffleEnabled() const
+{
+    return m_shuffleEnabled;
+}
+
+void User::setShuffleEnabled(bool enabled)
+{
+    m_shuffleEnabled = enabled;
+    qDebug() << "Shuffle" << (enabled ? "enabled" : "disabled");
+}
+
+bool User::isRepeatEnabled() const
+{
+    return m_repeatEnabled;
+}
+
+void User::setRepeatEnabled(bool enabled)
+{
+    m_repeatEnabled = enabled;
+    qDebug() << "Repeat" << (enabled ? "enabled" : "disabled");
+}
+
+Song User::getRandomSongFromCurrentPlaylist()
+{
+    if (isQueueMode()) {
+        Queue* queue = getQueue();
+        if (!queue->isEmpty()) {
+            std::random_device rd;
+            std::mt19937 g(rd());
+            std::uniform_int_distribution<> dis(0, queue->getSongCount() - 1);
+            int randomIndex = dis(g);
+            return queue->getSong(randomIndex);
+        }
+    } else {
+        Playlist* currentPlaylist = getCurrentPlaylist();
+        if (currentPlaylist && !currentPlaylist->isEmpty()) {
+            std::random_device rd;
+            std::mt19937 g(rd());
+            std::uniform_int_distribution<> dis(0, currentPlaylist->getSongCount() - 1);
+            int randomIndex = dis(g);
+            return currentPlaylist->getSong(randomIndex);
+        }
+    }
+    return Song(); // Invalid song if no songs available
 }
 
 QStringList User::getSupportedAudioFormats()

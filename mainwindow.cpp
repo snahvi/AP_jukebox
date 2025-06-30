@@ -284,14 +284,31 @@ void MainWindow::on_push_button_nxtsong_clicked()
         return;
     }
 
-    currentSongIndex++;
-    if (currentSongIndex >= currentPlaylist->getSongCount()) {
-        currentSongIndex = 0; // Loop to first song
+    if (currentUser->isShuffleEnabled()) {
+        // Get a random song
+        Song randomSong = currentUser->getRandomSongFromCurrentPlaylist();
+        if (randomSong.isValid()) {
+            // Find the index of this random song
+            for (int i = 0; i < currentPlaylist->getSongCount(); ++i) {
+                if (currentPlaylist->getSong(i).getFilePath() == randomSong.getFilePath()) {
+                    currentSongIndex = i;
+                    loadSong(currentSongIndex);
+                    qDebug() << "Random song loaded, index:" << currentSongIndex;
+                    updateNextSongDisplay();
+                    return;
+                }
+            }
+        }
+    } else {
+        // Normal sequential mode
+        currentSongIndex++;
+        if (currentSongIndex >= currentPlaylist->getSongCount()) {
+            currentSongIndex = 0; // Loop to first song
+        }
+        loadSong(currentSongIndex);
+        qDebug() << "Next song loaded, index:" << currentSongIndex;
+        updateNextSongDisplay();
     }
-
-    loadSong(currentSongIndex);
-    qDebug() << "Next song loaded, index:" << currentSongIndex;
-    updateNextSongDisplay();
 }
 
 
@@ -389,8 +406,11 @@ void MainWindow::initializeUser()
     
     // Initialize UI state
     ui->actionEnable_Queue->setChecked(false);
+    ui->button_shuffle->setChecked(false);
+    ui->button_repeat->setChecked(false);
     updatePlaylistDisplay();
     updateNextSongDisplay();
+    updateButtonStates();
 }
 
 void MainWindow::loadSong(int index)
@@ -421,7 +441,12 @@ void MainWindow::loadSong(int index)
 
     // Load the new song
     Mplayer->setSource(QUrl::fromLocalFile(filePath));
-    ui->label->setText(QString("🎵 Song %1/%2: %3").arg(index + 1).arg(currentPlaylist->getSongCount()).arg(song.getDisplayName()));
+    
+    // Add indicators to display
+    QString shuffleIndicator = currentUser->isShuffleEnabled() ? " 🔀" : "";
+    QString repeatIndicator = currentUser->isRepeatEnabled() ? " 🔁" : "";
+    
+    ui->label->setText(QString("🎵 Song %1/%2: %3%4%5").arg(index + 1).arg(currentPlaylist->getSongCount()).arg(song.getDisplayName()).arg(shuffleIndicator).arg(repeatIndicator));
     
     // Add error handling
     connect(Mplayer, &QMediaPlayer::errorOccurred, this, [](QMediaPlayer::Error error, const QString &errorString){
@@ -439,10 +464,13 @@ void MainWindow::loadSong(int index)
 
 void MainWindow::updatePlaylistDisplay()
 {
+    QString shuffleIndicator = currentUser->isShuffleEnabled() ? " 🔀" : "";
+    QString repeatIndicator = currentUser->isRepeatEnabled() ? " 🔁" : "";
+    
     if (currentUser->isQueueMode()) {
         Queue* queue = currentUser->getQueue();
         if (!queue->isEmpty()) {
-            ui->label_playlist_status->setText(QString("🎵 Queue Mode: %1 songs in queue").arg(queue->getSongCount()));
+            ui->label_playlist_status->setText(QString("🎵 Queue Mode: %1 songs in queue%2%3").arg(queue->getSongCount()).arg(shuffleIndicator).arg(repeatIndicator));
         } else {
             ui->label_playlist_status->setText("🎵 Queue Mode: Empty queue - Add songs to queue");
         }
@@ -450,7 +478,7 @@ void MainWindow::updatePlaylistDisplay()
         Playlist* currentPlaylist = currentUser->getCurrentPlaylist();
         if (currentPlaylist) {
             if (!currentPlaylist->isEmpty()) {
-                ui->label_playlist_status->setText(QString("🎧 %1: %2 songs").arg(currentPlaylist->getName()).arg(currentPlaylist->getSongCount()));
+                ui->label_playlist_status->setText(QString("🎧 %1: %2 songs%3%4").arg(currentPlaylist->getName()).arg(currentPlaylist->getSongCount()).arg(shuffleIndicator).arg(repeatIndicator));
             } else {
                 ui->label_playlist_status->setText(QString("📂 %1: Empty playlist - Add songs to start playing").arg(currentPlaylist->getName()));
             }
@@ -589,6 +617,11 @@ void MainWindow::on_actionLoad_Playlist_triggered()
             QMessageBox::information(this, tr("Queue Cleared"), 
                                    tr("Switched to playlist mode. Queue has been cleared."));
         }
+        
+        // Reset shuffle and repeat when switching playlists
+        currentUser->setShuffleEnabled(false);
+        currentUser->setRepeatEnabled(false);
+        updateButtonStates();
         
         currentUser->setCurrentPlaylist(selectedPlaylist);
         Playlist* playlist = currentUser->getCurrentPlaylist();
@@ -773,6 +806,11 @@ void MainWindow::on_actionAdd_Songs_triggered()
                      ui->actionEnable_Queue->setChecked(false);
                  }
                  
+                 // Reset shuffle and repeat when switching playlists
+                 currentUser->setShuffleEnabled(false);
+                 currentUser->setRepeatEnabled(false);
+                 updateButtonStates();
+                 
                  currentUser->setCurrentPlaylist(selectedPlaylistName);
                  playCurrentPlaylist();
              }
@@ -801,8 +839,25 @@ void MainWindow::loadNextSongFromQueue()
         return;
     }
     
-    // Take (remove and get) the first song from queue
-    Song nextSong = queue->takeFirstSong();
+    // Take song from queue (respecting shuffle mode)
+    Song nextSong;
+    if (currentUser->isShuffleEnabled()) {
+        // Get random song from queue
+        Song randomSong = currentUser->getRandomSongFromCurrentPlaylist();
+        if (randomSong.isValid()) {
+            // Find and remove this song from queue
+            for (int i = 0; i < queue->getSongCount(); ++i) {
+                if (queue->getSong(i).getFilePath() == randomSong.getFilePath()) {
+                    nextSong = randomSong;
+                    queue->removeSong(i);
+                    break;
+                }
+            }
+        }
+    } else {
+        nextSong = queue->takeFirstSong();
+    }
+    
     if (!nextSong.isValid()) {
         qDebug() << "Invalid song from queue";
         return;
@@ -817,7 +872,9 @@ void MainWindow::loadNextSongFromQueue()
     
     // Load the song
     Mplayer->setSource(QUrl::fromLocalFile(nextSong.getFilePath()));
-    ui->label->setText(QString("🎵 From Queue: %1").arg(nextSong.getDisplayName()));
+    QString shuffleIndicator = currentUser->isShuffleEnabled() ? " 🔀" : "";
+    QString repeatIndicator = currentUser->isRepeatEnabled() ? " 🔁" : "";
+    ui->label->setText(QString("🎵 From Queue: %1%2%3").arg(nextSong.getDisplayName()).arg(shuffleIndicator).arg(repeatIndicator));
     
     qDebug() << "Loaded song from queue:" << nextSong.getDisplayName();
     currentSongIndex = 0; // Use 0 to indicate we have a loaded song
@@ -835,6 +892,18 @@ void MainWindow::onSongFinished()
 {
     qDebug() << "Song finished";
     
+    // Check if repeat is enabled
+    if (currentUser->isRepeatEnabled() && !currentUser->isQueueMode()) {
+        // Repeat the current song
+        if (currentSongIndex >= 0) {
+            loadSong(currentSongIndex);
+            qDebug() << "Repeating current song, index:" << currentSongIndex;
+            updateNextSongDisplay();
+            updatePlaylistDisplay();
+            return;
+        }
+    }
+    
     if (currentUser->isQueueMode()) {
         // In queue mode, automatically play the next song from queue
         loadNextSongFromQueue();
@@ -843,8 +912,9 @@ void MainWindow::onSongFinished()
         on_push_button_nxtsong_clicked();
     }
     
-    // Update next song display after song change
+    // Update displays after song change
     updateNextSongDisplay();
+    updatePlaylistDisplay();
 }
 
 void MainWindow::on_actionEnable_Queue_triggered()
@@ -880,6 +950,7 @@ void MainWindow::on_actionEnable_Queue_triggered()
     
     updatePlaylistDisplay();
     updateNextSongDisplay();
+    updateButtonStates();
 }
 
 void MainWindow::on_actionAdd_to_Queue_triggered()
@@ -1164,15 +1235,19 @@ void MainWindow::on_actionClear_Queue_triggered()
 void MainWindow::updateNextSongDisplay()
 {
     Song nextSong = getNextSong();
+    bool shuffleEnabled = currentUser->isShuffleEnabled();
+    bool repeatEnabled = currentUser->isRepeatEnabled();
     
     if (nextSong.isValid()) {
         if (currentUser->isQueueMode()) {
             Queue* queue = currentUser->getQueue();
             int remainingAfter = queue->getSongCount() - 1;
             if (remainingAfter > 0) {
-                ui->label_next_song->setText(QString("⏭️ Next in Queue: %1 (%2 more after)")
+                QString shuffleText = shuffleEnabled ? " 🔀" : "";
+                ui->label_next_song->setText(QString("⏭️ Next in Queue: %1 (%2 more after)%3")
                                            .arg(nextSong.getDisplayName())
-                                           .arg(remainingAfter));
+                                           .arg(remainingAfter)
+                                           .arg(shuffleText));
             } else {
                 ui->label_next_song->setText(QString("⏭️ Last song in Queue: %1")
                                            .arg(nextSong.getDisplayName()));
@@ -1180,12 +1255,16 @@ void MainWindow::updateNextSongDisplay()
         } else {
             Playlist* currentPlaylist = currentUser->getCurrentPlaylist();
             if (currentPlaylist) {
-                if (currentSongIndex >= 0) {
+                if (repeatEnabled) {
+                    ui->label_next_song->setText(QString("⏭️ Repeat: Current song will repeat 🔁"));
+                } else if (currentSongIndex >= 0) {
                     int nextIndex = (currentSongIndex + 1) % currentPlaylist->getSongCount();
-                    ui->label_next_song->setText(QString("⏭️ Next in Playlist: %1 (%2/%3)")
+                    QString shuffleText = shuffleEnabled ? " 🔀" : "";
+                    ui->label_next_song->setText(QString("⏭️ Next in Playlist: %1 (%2/%3)%4")
                                                .arg(nextSong.getDisplayName())
                                                .arg(nextIndex + 1)
-                                               .arg(currentPlaylist->getSongCount()));
+                                               .arg(currentPlaylist->getSongCount())
+                                               .arg(shuffleText));
                 } else {
                     ui->label_next_song->setText(QString("⏭️ First song ready: %1")
                                                .arg(nextSong.getDisplayName()));
@@ -1193,10 +1272,13 @@ void MainWindow::updateNextSongDisplay()
             }
         }
     } else {
+        // Handle cases where next song is not predictable or available
         if (currentUser->isQueueMode()) {
             Queue* queue = currentUser->getQueue();
             if (queue->isEmpty()) {
                 ui->label_next_song->setText("⏭️ Queue is empty - Add songs to queue");
+            } else if (shuffleEnabled) {
+                ui->label_next_song->setText(QString("⏭️ Random song from queue (%1 songs) 🔀").arg(queue->getSongCount()));
             } else {
                 ui->label_next_song->setText("⏭️ Queue will be empty after current song");
             }
@@ -1204,6 +1286,10 @@ void MainWindow::updateNextSongDisplay()
             Playlist* currentPlaylist = currentUser->getCurrentPlaylist();
             if (!currentPlaylist || currentPlaylist->isEmpty()) {
                 ui->label_next_song->setText("⏭️ No songs available - Add songs to play");
+            } else if (repeatEnabled) {
+                ui->label_next_song->setText(QString("⏭️ Repeat: Current song will repeat 🔁"));
+            } else if (shuffleEnabled) {
+                ui->label_next_song->setText(QString("⏭️ Random song from playlist (%1 songs) 🔀").arg(currentPlaylist->getSongCount()));
             } else if (currentSongIndex < 0) {
                 ui->label_next_song->setText("⏭️ Press play to start playlist");
             } else {
@@ -1218,11 +1304,20 @@ Song MainWindow::getNextSong()
     if (currentUser->isQueueMode()) {
         Queue* queue = currentUser->getQueue();
         if (!queue->isEmpty()) {
+            if (currentUser->isShuffleEnabled()) {
+                // For shuffle mode, we can't predict the next song (it's random)
+                return Song(); // This will show appropriate message in next song display
+            }
             return queue->getSong(0); // First song in queue is next
         }
     } else {
         Playlist* currentPlaylist = currentUser->getCurrentPlaylist();
         if (currentPlaylist && !currentPlaylist->isEmpty()) {
+            if (currentUser->isShuffleEnabled()) {
+                // For shuffle mode, we can't predict the next song (it's random)
+                return Song(); // This will show appropriate message in next song display
+            }
+            
             if (currentSongIndex >= 0) {
                 // Get next song in playlist (with looping)
                 int nextIndex = (currentSongIndex + 1) % currentPlaylist->getSongCount();
@@ -1234,4 +1329,55 @@ Song MainWindow::getNextSong()
         }
     }
     return Song(); // Return invalid song if no next song
+}
+
+void MainWindow::updateButtonStates()
+{
+    // Update button visual states based on current settings
+    ui->button_shuffle->setChecked(currentUser->isShuffleEnabled());
+    ui->button_repeat->setChecked(currentUser->isRepeatEnabled());
+    
+    // Update other displays that depend on these states
+    updatePlaylistDisplay();
+    updateNextSongDisplay();
+}
+
+void MainWindow::on_button_shuffle_clicked()
+{
+    bool enabled = ui->button_shuffle->isChecked();
+    currentUser->setShuffleEnabled(enabled);
+    
+    qDebug() << "Shuffle button clicked, enabled:" << enabled;
+    
+    // Update displays
+    updateButtonStates();
+    
+    // Show user feedback
+    if (enabled) {
+        QMessageBox::information(this, tr("Shuffle Enabled"), 
+                               tr("Shuffle is now ON. Next songs will be chosen randomly."));
+    } else {
+        QMessageBox::information(this, tr("Shuffle Disabled"), 
+                               tr("Shuffle is now OFF. Songs will play in playlist order."));
+    }
+}
+
+void MainWindow::on_button_repeat_clicked()
+{
+    bool enabled = ui->button_repeat->isChecked();
+    currentUser->setRepeatEnabled(enabled);
+    
+    qDebug() << "Repeat button clicked, enabled:" << enabled;
+    
+    // Update displays
+    updateButtonStates();
+    
+    // Show user feedback
+    if (enabled) {
+        QMessageBox::information(this, tr("Repeat Enabled"), 
+                               tr("Repeat is now ON. Current song will repeat after finishing."));
+    } else {
+        QMessageBox::information(this, tr("Repeat Disabled"), 
+                               tr("Repeat is now OFF. Songs will advance normally."));
+    }
 }

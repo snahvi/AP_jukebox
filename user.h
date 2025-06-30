@@ -29,6 +29,8 @@ public:
     void moveUp(int index);
     void moveDown(int index);
     
+
+    
 private:
     QString m_name;
     QList<Song> m_songs;
@@ -87,6 +89,13 @@ public:
     bool isQueueMode() const;
     void setQueueMode(bool enabled);
     
+    // Simple shuffle and repeat
+    bool isShuffleEnabled() const;
+    void setShuffleEnabled(bool enabled);
+    bool isRepeatEnabled() const;
+    void setRepeatEnabled(bool enabled);
+    Song getRandomSongFromCurrentPlaylist();
+    
     // Folder scanning
     QList<Song> scanFolderForSongs(const QString &folderPath);
     void createPlaylistFromFolder(const QString &playlistName, const QString &folderPath);
@@ -100,6 +109,8 @@ private:
     QString m_currentPlaylistName;
     Queue m_queue;
     bool m_queueMode;
+    bool m_shuffleEnabled;
+    bool m_repeatEnabled;
 };
 
 #endif // USER_H 
