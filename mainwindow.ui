@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>819</width>
-    <height>462</height>
+    <height>484</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>🎵 MuPlayer - Music Player with Playlist</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">   background-color: #0D1A4A;</string>
+   <string notr="true">   background-color: #2D1B4A;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label">
@@ -53,7 +53,7 @@ text-align: center;</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>320</y>
       <width>681</width>
       <height>31</height>
      </rect>
@@ -99,7 +99,7 @@ QSlider::handle:horizontal:hover {
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>330</y>
+      <y>350</y>
       <width>54</width>
       <height>54</height>
      </rect>
@@ -133,7 +133,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>330</y>
+      <y>350</y>
       <width>54</width>
       <height>54</height>
      </rect>
@@ -167,7 +167,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>520</x>
-      <y>330</y>
+      <y>350</y>
       <width>54</width>
       <height>54</height>
      </rect>
@@ -201,7 +201,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>330</y>
+      <y>350</y>
       <width>54</width>
       <height>54</height>
      </rect>
@@ -246,7 +246,7 @@ QPushButton:checked
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>330</y>
+      <y>350</y>
       <width>54</width>
       <height>54</height>
      </rect>
@@ -291,7 +291,7 @@ QPushButton:checked
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>330</y>
+      <y>350</y>
       <width>54</width>
       <height>54</height>
      </rect>
@@ -325,7 +325,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>340</y>
+      <y>360</y>
       <width>64</width>
       <height>64</height>
      </rect>
@@ -385,7 +385,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>280</y>
+      <y>300</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -401,7 +401,7 @@ QPushButton:hover
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>280</y>
+      <y>300</y>
       <width>63</width>
       <height>20</height>
      </rect>
@@ -506,9 +506,20 @@ padding: 3px;</string>
     <addaction name="separator"/>
     <addaction name="actionClear_Queue"/>
    </widget>
+   <widget class="QMenu" name="menuTheme">
+    <property name="title">
+     <string>Theme</string>
+    </property>
+    <addaction name="actionTheme_Dark_Purple"/>
+    <addaction name="actionTheme_Dark_Blue"/>
+    <addaction name="actionTheme_Dark_Green"/>
+    <addaction name="actionTheme_Dark_Red"/>
+    <addaction name="actionTheme_Black"/>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuPlaylist"/>
    <addaction name="menuQueue"/>
+   <addaction name="menuTheme"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_file">
@@ -559,7 +570,49 @@ padding: 3px;</string>
     <string>Clear Queue</string>
    </property>
   </action>
-
+  <action name="actionTheme_Dark_Purple">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark Purple</string>
+   </property>
+  </action>
+  <action name="actionTheme_Dark_Blue">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark Blue</string>
+   </property>
+  </action>
+  <action name="actionTheme_Dark_Green">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark Green</string>
+   </property>
+  </action>
+  <action name="actionTheme_Dark_Red">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark Red</string>
+   </property>
+  </action>
+  <action name="actionTheme_Black">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Black</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

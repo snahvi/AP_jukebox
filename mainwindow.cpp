@@ -408,6 +408,10 @@ void MainWindow::initializeUser()
     ui->actionEnable_Queue->setChecked(false);
     ui->button_shuffle->setChecked(false);
     ui->button_repeat->setChecked(false);
+    
+    // Initialize theme (Dark Purple is default)
+    ui->actionTheme_Dark_Purple->setChecked(true);
+    
     updatePlaylistDisplay();
     updateNextSongDisplay();
     updateButtonStates();
@@ -458,6 +462,12 @@ void MainWindow::loadSong(int index)
     });
 
     qDebug() << "Song loaded successfully:" << song.getDisplayName();
+    
+    // Automatically start playing the loaded song
+    Mplayer->play();
+    Is_Playing = true;
+    ui->pushButton_play->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    
     updatePlaylistDisplay();
     updateNextSongDisplay();
 }
@@ -1381,3 +1391,71 @@ void MainWindow::on_button_repeat_clicked()
                                tr("Repeat is now OFF. Songs will advance normally."));
     }
 }
+
+void MainWindow::updateThemeSelection()
+{
+    // Make sure only one theme is checked at a time
+    QList<QAction*> themeActions = {
+        ui->actionTheme_Dark_Purple,
+        ui->actionTheme_Dark_Blue,
+        ui->actionTheme_Dark_Green,
+        ui->actionTheme_Dark_Red,
+        ui->actionTheme_Black
+    };
+    
+    for (QAction* action : themeActions) {
+        if (action != sender()) {
+            action->setChecked(false);
+        }
+    }
+}
+
+void MainWindow::changeBackgroundColor(const QString &color)
+{
+    // Update the main window background color
+    this->setStyleSheet(QString("MainWindow { background-color: %1; }").arg(color));
+    
+    qDebug() << "Background color changed to:" << color;
+}
+
+void MainWindow::on_actionTheme_Dark_Purple_triggered()
+{
+    updateThemeSelection();
+    changeBackgroundColor("#2D1B4A");
+    QMessageBox::information(this, tr("Theme Changed"), 
+                           tr("Theme changed to Dark Purple! 🟣"));
+}
+
+void MainWindow::on_actionTheme_Dark_Blue_triggered()
+{
+    updateThemeSelection();
+    changeBackgroundColor("#0D1A4A");
+    QMessageBox::information(this, tr("Theme Changed"), 
+                           tr("Theme changed to Dark Blue! 🔵"));
+}
+
+void MainWindow::on_actionTheme_Dark_Green_triggered()
+{
+    updateThemeSelection();
+    changeBackgroundColor("#1B4A2D");
+    QMessageBox::information(this, tr("Theme Changed"), 
+                           tr("Theme changed to Dark Green! 🟢"));
+}
+
+void MainWindow::on_actionTheme_Dark_Red_triggered()
+{
+    updateThemeSelection();
+    changeBackgroundColor("#4A1B2D");
+    QMessageBox::information(this, tr("Theme Changed"), 
+                           tr("Theme changed to Dark Red! 🔴"));
+}
+
+void MainWindow::on_actionTheme_Black_triggered()
+{
+    updateThemeSelection();
+    changeBackgroundColor("#1A1A1A");
+    QMessageBox::information(this, tr("Theme Changed"), 
+                           tr("Theme changed to Black! ⚫"));
+}
+
+

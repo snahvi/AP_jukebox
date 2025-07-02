@@ -65,6 +65,15 @@ private slots:
     // Button slots
     void on_button_shuffle_clicked();
     void on_button_repeat_clicked();
+    
+    // Theme slots
+    void on_actionTheme_Dark_Purple_triggered();
+    void on_actionTheme_Dark_Blue_triggered();
+    void on_actionTheme_Dark_Green_triggered();
+    void on_actionTheme_Dark_Red_triggered();
+    void on_actionTheme_Black_triggered();
+
+    void on_radioButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -86,6 +95,8 @@ private:
     void updatePlaylistDisplay();
     void updateNextSongDisplay();
     void updateButtonStates();
+    void updateThemeSelection();
+    void changeBackgroundColor(const QString &color);
     void playCurrentPlaylist();
     Song getCurrentSong();
     Song getNextSong();
