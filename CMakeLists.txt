@@ -14,6 +14,8 @@ qt_add_executable(muplayer
     song.h
     user.cpp
     user.h
+    equalizerwidget.cpp
+    equalizerwidget.h
 )
 
 target_link_libraries(muplayer

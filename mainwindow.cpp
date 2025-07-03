@@ -79,6 +79,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set window title
     setWindowTitle("MuPlayer - Music Player");
+    
+    // Setup the equalizer widget
+    setupEqualizer();
 }
 
 MainWindow::~MainWindow()
@@ -1422,6 +1425,7 @@ void MainWindow::on_actionTheme_Dark_Purple_triggered()
 {
     updateThemeSelection();
     changeBackgroundColor("#2D1B4A");
+    updateEqualizerColorForTheme("#2D1B4A");
     QMessageBox::information(this, tr("Theme Changed"), 
                            tr("Theme changed to Dark Purple! 🟣"));
 }
@@ -1430,6 +1434,7 @@ void MainWindow::on_actionTheme_Dark_Blue_triggered()
 {
     updateThemeSelection();
     changeBackgroundColor("#0D1A4A");
+    updateEqualizerColorForTheme("#0D1A4A");
     QMessageBox::information(this, tr("Theme Changed"), 
                            tr("Theme changed to Dark Blue! 🔵"));
 }
@@ -1438,6 +1443,7 @@ void MainWindow::on_actionTheme_Dark_Green_triggered()
 {
     updateThemeSelection();
     changeBackgroundColor("#1B4A2D");
+    updateEqualizerColorForTheme("#1B4A2D");
     QMessageBox::information(this, tr("Theme Changed"), 
                            tr("Theme changed to Dark Green! 🟢"));
 }
@@ -1446,6 +1452,7 @@ void MainWindow::on_actionTheme_Dark_Red_triggered()
 {
     updateThemeSelection();
     changeBackgroundColor("#4A1B2D");
+    updateEqualizerColorForTheme("#4A1B2D");
     QMessageBox::information(this, tr("Theme Changed"), 
                            tr("Theme changed to Dark Red! 🔴"));
 }
@@ -1454,8 +1461,83 @@ void MainWindow::on_actionTheme_Black_triggered()
 {
     updateThemeSelection();
     changeBackgroundColor("#1A1A1A");
+    updateEqualizerColorForTheme("#1A1A1A");
     QMessageBox::information(this, tr("Theme Changed"), 
                            tr("Theme changed to Black! ⚫"));
+}
+
+void MainWindow::setupEqualizer()
+{
+    // Create the equalizer widget
+    equalizerWidget = new EqualizerWidget(ui->centralwidget);
+    equalizerWidget->setColors(QColor(255, 165, 0), QColor(255, 200, 50));
+    equalizerWidget->setBarCount(80);
+    equalizerWidget->setAnimationSpeed(50);
+    equalizerWidget->setFixedHeight(120);
+
+    // Use the layout system to avoid overlap
+    QVBoxLayout *mainLayout = qobject_cast<QVBoxLayout*>(ui->centralwidget->layout());
+    if (!mainLayout) {
+        mainLayout = new QVBoxLayout(ui->centralwidget);
+        ui->centralwidget->setLayout(mainLayout);
+    }
+
+    // Find the index of the horizontalSlider
+    int sliderIndex = -1;
+    for (int i = 0; i < mainLayout->count(); ++i) {
+        if (mainLayout->itemAt(i)->widget() == ui->horizontalSlider) {
+            sliderIndex = i;
+            break;
+        }
+    }
+
+    // Insert the equalizer just above the slider
+    if (sliderIndex != -1) {
+        mainLayout->insertWidget(sliderIndex, equalizerWidget);
+    } else {
+        mainLayout->addWidget(equalizerWidget);
+    }
+
+    // Connect equalizer to media player state
+    connect(Mplayer, &QMediaPlayer::playbackStateChanged, this,
+            [this](QMediaPlayer::PlaybackState state) {
+        if (state == QMediaPlayer::PlayingState) {
+            equalizerWidget->startAnimation();
+            qDebug() << "Equalizer animation started";
+        } else {
+            equalizerWidget->stopAnimation();
+            qDebug() << "Equalizer animation stopped";
+        }
+    });
+
+    qDebug() << "Equalizer widget setup completed";
+}
+
+void MainWindow::on_radioButton_clicked()
+{
+    // Handle radio button click event
+    qDebug() << "Radio button clicked";
+    // Add your radio button logic here if needed
+}
+
+// Helper function to update equalizer color based on background
+void MainWindow::updateEqualizerColorForTheme(const QString &bgColor)
+{
+    if (!equalizerWidget) return;
+    if (bgColor == "#2D1B4A") { // Dark Purple
+        equalizerWidget->setColors(QColor("#FFA500"), QColor("#FFC832")); // Orange → Yellow
+    } else if (bgColor == "#0D1A4A") { // Dark Blue
+        equalizerWidget->setColors(QColor("#00E5FF"), QColor("#81D4FA")); // Cyan → Light Blue
+    } else if (bgColor == "#1B4A2D") { // Dark Green
+        equalizerWidget->setColors(QColor("#B2FF59"), QColor("#D4FFB2")); // Lime → Yellow-Green
+    } else if (bgColor == "#4A1B2D") { // Dark Red
+        equalizerWidget->setColors(QColor("#FF4081"), QColor("#FFAB40")); // Pink → Orange
+    } else if (bgColor == "#1A1A1A") { // Black
+        equalizerWidget->setColors(QColor("#FFFFFF"), QColor("#B0BEC5")); // White → Light Gray
+    } else {
+        // Default fallback
+        equalizerWidget->setColors(QColor("#FFA500"), QColor("#FFC832"));
+    }
 }
 
 

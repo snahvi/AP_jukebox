@@ -4,6 +4,7 @@
 #include "ui_mainwindow.h"
 #include "user.h"
 #include "song.h"
+#include "equalizerwidget.h"
 #include <QMainWindow>
 #include <QtMultimedia/QMediaPlayer>
 #include <QtCore>
@@ -87,6 +88,9 @@ private:
     // User and playlist functionality
     User *currentUser;
     int currentSongIndex;
+    
+    // Equalizer widget
+    EqualizerWidget *equalizerWidget;
 
     // Helper methods
     void loadSong(int index);
@@ -101,6 +105,8 @@ private:
     Song getCurrentSong();
     Song getNextSong();
     void onSongFinished();
+    void setupEqualizer();
+    void updateEqualizerColorForTheme(const QString &bgColor);
 };
 
 #endif // MAINWINDOW_H
